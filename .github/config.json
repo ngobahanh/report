@@ -1,0 +1,6 @@
+{
+  ".github": {
+    "description": "This is where to add VS Code customizations for Copilot",
+    "copilot-instructions.md": "Add workspace-specific instructions for Copilot"
+  }
+}
