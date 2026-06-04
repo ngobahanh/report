@@ -9,12 +9,9 @@ const api = axios.create({
 
 // Personnel
 export const personnelAPI = {
-  getAll: (page = 1, limit = 10, search = '', filters = {}) => {
+  getAll: (page = 1, limit = 10, search = '', unitId = null) => {
     let url = `${API_BASE}/personnel?page=${page}&limit=${limit}&search=${search}`;
-    if (filters.rank) url += `&rank=${filters.rank}`;
-    if (filters.position) url += `&position=${filters.position}`;
-    if (filters.unitId) url += `&unitId=${filters.unitId}`;
-    if (filters.hometown) url += `&hometown=${filters.hometown}`;
+    if (unitId) url += `&unitId=${unitId}`;
     return api.get(url);
   },
   getById: (id) => api.get(`${API_BASE}/personnel/${id}`),
