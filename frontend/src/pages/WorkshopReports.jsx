@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import Pagination from '../components/Pagination';
 import { workshopReportsAPI, personnelAPI } from '../services/api';
@@ -130,7 +131,7 @@ export default function WorkshopReports() {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {data.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={item.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => navigate(`/workshop-reports/${item.id}`)}>
                       <td className="px-6 py-4 text-sm text-gray-900">{item.training_content.substring(0, 40)}...</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{formatDateTime(item.training_time)}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{item.executor?.full_name}</td>

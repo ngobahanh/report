@@ -1,5 +1,6 @@
 const TaskReport = require('../models/TaskReport');
 const TaskDetail = require('../models/TaskDetail');
+const Personnel = require('../models/Personnel');
 const { Op } = require('sequelize');
 
 exports.getAll = async (req, res) => {
@@ -21,10 +22,17 @@ exports.getAll = async (req, res) => {
       order: [['report_time', 'DESC']]
     });
 
-    // Get task details for each report
+    // Get task details for each report with responsible person info
     for (let report of rows) {
       report.dataValues.tasks = await TaskDetail.findAll({
-        where: { task_report_id: report.id }
+        where: { task_report_id: report.id },
+        include: [
+          {
+            model: Personnel,
+            as: 'responsible',
+            attributes: ['id', 'full_name', 'rank', 'position']
+          }
+        ]
       });
     }
 
@@ -46,7 +54,14 @@ exports.getById = async (req, res) => {
     if (!report) return res.status(404).json({ error: 'Not found' });
 
     const tasks = await TaskDetail.findAll({
-      where: { task_report_id: report.id }
+      where: { task_report_id: report.id },
+      include: [
+        {
+          model: Personnel,
+          as: 'responsible',
+          attributes: ['id', 'full_name', 'rank', 'position']
+        }
+      ]
     });
     report.dataValues.tasks = tasks;
 
@@ -72,7 +87,14 @@ exports.create = async (req, res) => {
 
     const fullReport = await TaskReport.findByPk(report.id);
     const taskDetails = await TaskDetail.findAll({
-      where: { task_report_id: report.id }
+      where: { task_report_id: report.id },
+      include: [
+        {
+          model: Personnel,
+          as: 'responsible',
+          attributes: ['id', 'full_name', 'rank', 'position']
+        }
+      ]
     });
     fullReport.dataValues.tasks = taskDetails;
 
@@ -101,7 +123,14 @@ exports.update = async (req, res) => {
     }
 
     const taskDetails = await TaskDetail.findAll({
-      where: { task_report_id: report.id }
+      where: { task_report_id: report.id },
+      include: [
+        {
+          model: Personnel,
+          as: 'responsible',
+          attributes: ['id', 'full_name', 'rank', 'position']
+        }
+      ]
     });
     report.dataValues.tasks = taskDetails;
 

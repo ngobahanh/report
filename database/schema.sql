@@ -80,9 +80,12 @@ CREATE TABLE IF NOT EXISTS task_details (
   task_name VARCHAR(255) NOT NULL,
   progress_percent INT DEFAULT 0,
   status ENUM('pending', 'in_progress', 'completed', 'on_hold') DEFAULT 'pending',
+  responsible_id INT DEFAULT NULL,
+  due_date DATE DEFAULT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (task_report_id) REFERENCES task_reports(id) ON DELETE CASCADE
+  FOREIGN KEY (task_report_id) REFERENCES task_reports(id) ON DELETE CASCADE,
+  FOREIGN KEY (responsible_id) REFERENCES personnel(id) ON DELETE SET NULL
 );
 
 -- Device Reports Table

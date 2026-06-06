@@ -27,11 +27,30 @@ const TaskDetail = sequelize.define('TaskDetail', {
   status: {
     type: DataTypes.ENUM('pending', 'in_progress', 'completed', 'on_hold'),
     defaultValue: 'pending'
+  },
+  responsible_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'personnel',
+      key: 'id'
+    },
+    onDelete: 'SET NULL'
+  },
+  due_date: {
+    type: DataTypes.DATE,
+    allowNull: true
   }
 }, {
   tableName: 'task_details',
   timestamps: true,
   underscored: true
+});
+
+// Association with Personnel
+TaskDetail.belongsTo(require('./Personnel'), {
+  foreignKey: 'responsible_id',
+  as: 'responsible'
 });
 
 module.exports = TaskDetail;

@@ -1,28 +1,35 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import Pagination from '../components/Pagination';
-import { taskReportsAPI } from '../services/api';
-import { formatDateTime } from '../utils/dateUtils';
+import { taskReportsAPI, personnelAPI } from '../services/api';
+import { formatDateTime, formatDate } from '../utils/dateUtils';
 
 export default function TaskReports() {
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [taskRows, setTaskRows] = useState([{ task_name: '', progress_percent: 0, status: 'pending' }]);
-  const [formData, setFormData] = useState({
-    report_time: '',
-    total_personnel: '',
-    present_personnel: '',
-    absent_personnel: '',
-    absence_reason: ''
-  });
+  const [personnel, setPersonnel] = useState([]);
+  const [taskRows, setTaskRows] = useState([{ task_name: '', progress_percent: 0, status: 'pending', responsible_id: '', due_date: '' }]);
+  const [formData, setFormData] = useState({});
 
   useEffect(() => {
+    loadPersonnel();
     loadData();
   }, [page]);
+
+  const loadPersonnel = async () => {
+    try {
+      const response = await personnelAPI.getAll(1, 1000);
+      setPersonnel(response.data.data || response.data);
+    } catch (error) {
+      console.error('Error loading personnel:', error);
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -40,27 +47,15 @@ export default function TaskReports() {
 
   const handleAdd = () => {
     setEditingId(null);
-    setTaskRows([{ task_name: '', progress_percent: 0, status: 'pending' }]);
-    setFormData({
-      report_time: '',
-      total_personnel: '',
-      present_personnel: '',
-      absent_personnel: '',
-      absence_reason: ''
-    });
+    setTaskRows([{ task_name: '', progress_percent: 0, status: 'pending', responsible_id: '', due_date: '' }]);
+    setFormData({});
     setModalOpen(true);
   };
 
   const handleEdit = (item) => {
     setEditingId(item.id);
     setTaskRows(item.tasks || []);
-    setFormData({
-      report_time: item.report_time.split('.')[0],
-      total_personnel: item.total_personnel,
-      present_personnel: item.present_personnel,
-      absent_personnel: item.absent_personnel,
-      absence_reason: item.absence_reason || ''
-    });
+    setFormData({});
     setModalOpen(true);
   };
 
@@ -78,7 +73,7 @@ export default function TaskReports() {
   };
 
   const handleAddTask = () => {
-    setTaskRows([...taskRows, { task_name: '', progress_percent: 0, status: 'pending' }]);
+    setTaskRows([...taskRows, { task_name: '', progress_percent: 0, status: 'pending', responsible_id: '', due_date: '' }]);
   };
 
   const handleUpdateTask = (index, field, value) => {
@@ -135,20 +130,14 @@ export default function TaskReports() {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Thời gian</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Tổng quân số</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Có mặt</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Vắng</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Báo cáo</th>
                     <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {data.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm text-gray-900">{formatDateTime(item.report_time)}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{item.total_personnel}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{item.present_personnel}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{item.absent_personnel}</td>
+                    <tr key={item.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => navigate(`/task-reports/${item.id}`)}>
+                      <td className="px-6 py-4 text-sm text-gray-600">Báo cáo #{item.id}</td>
                       <td className="px-6 py-4 text-right text-sm space-x-2">
                         <button
                           onClick={() => handleEdit(item)}
@@ -180,56 +169,6 @@ export default function TaskReports() {
         onSubmit={handleSubmit}
       >
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Thời gian báo cáo</label>
-            <input
-              type="datetime-local"
-              value={formData.report_time}
-              onChange={(e) => setFormData({ ...formData, report_time: e.target.value })}
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
-            />
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Tổng quân số</label>
-              <input
-                type="number"
-                value={formData.total_personnel}
-                onChange={(e) => setFormData({ ...formData, total_personnel: e.target.value })}
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Có mặt</label>
-              <input
-                type="number"
-                value={formData.present_personnel}
-                onChange={(e) => setFormData({ ...formData, present_personnel: e.target.value })}
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Vắng</label>
-              <input
-                type="number"
-                value={formData.absent_personnel}
-                onChange={(e) => setFormData({ ...formData, absent_personnel: e.target.value })}
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Lý do vắng</label>
-            <textarea
-              value={formData.absence_reason}
-              onChange={(e) => setFormData({ ...formData, absence_reason: e.target.value })}
-              rows="2"
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
-            />
-          </div>
-
           <div className="border-t pt-4">
             <div className="flex justify-between items-center mb-3">
               <label className="block text-sm font-medium text-gray-700">Danh sách nhiệm vụ</label>
@@ -258,7 +197,7 @@ export default function TaskReports() {
                     placeholder="%"
                     value={task.progress_percent}
                     onChange={(e) => handleUpdateTask(index, 'progress_percent', e.target.value)}
-                    className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                    className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
                   />
                   <select
                     value={task.status}
@@ -270,6 +209,23 @@ export default function TaskReports() {
                     <option value="completed">Xong</option>
                     <option value="on_hold">Tạm</option>
                   </select>
+                  <select
+                    value={task.responsible_id || ''}
+                    onChange={(e) => handleUpdateTask(index, 'responsible_id', e.target.value)}
+                    className="px-2 py-1 border border-gray-300 rounded text-sm max-w-xs"
+                    title="Người phụ trách"
+                  >
+                    <option value="">---</option>
+                    {personnel.map((p) => (
+                      <option key={p.id} value={p.id}>{p.full_name}</option>
+                    ))}
+                  </select>
+                  <input
+                    type="date"
+                    value={task.due_date || ''}
+                    onChange={(e) => handleUpdateTask(index, 'due_date', e.target.value)}
+                    className="px-2 py-1 border border-gray-300 rounded text-sm"
+                  />
                 </div>
               ))}
             </div>

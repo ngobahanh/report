@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import Pagination from '../components/Pagination';
 import { trainingReportsAPI, personnelAPI } from '../services/api';
 import { formatDateTime } from '../utils/dateUtils';
 
 export default function TrainingReports() {
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [personnel, setPersonnel] = useState([]);
   const [page, setPage] = useState(1);
@@ -138,7 +140,7 @@ export default function TrainingReports() {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {data.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={item.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => navigate(`/training-reports/${item.id}`)}>
                       <td className="px-6 py-4 text-sm text-gray-900">{item.training_content.substring(0, 30)}...</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{item.training_topic}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{formatDateTime(item.training_time)}</td>

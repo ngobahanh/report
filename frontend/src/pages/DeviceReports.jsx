@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import Pagination from '../components/Pagination';
 import { deviceReportsAPI, unitsAPI } from '../services/api';
@@ -6,6 +7,7 @@ import { formatDateTime, formatDate } from '../utils/dateUtils';
 import { statusColors, statusLabels } from '../utils/constants';
 
 export default function DeviceReports() {
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [units, setUnits] = useState([]);
   const [page, setPage] = useState(1);
@@ -162,7 +164,7 @@ export default function DeviceReports() {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {data.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={item.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => navigate(`/device-reports/${item.id}`)}>
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.device_name}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{item.unit?.unit_name}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{formatDateTime(item.disconnect_time)}</td>

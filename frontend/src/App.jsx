@@ -6,9 +6,13 @@ import Dashboard from './pages/Dashboard';
 import Personnel from './pages/Personnel';
 import Units from './pages/Units';
 import TrainingReports from './pages/TrainingReports';
+import TrainingReportDetail from './pages/TrainingReportDetail';
 import WorkshopReports from './pages/WorkshopReports';
+import WorkshopReportDetail from './pages/WorkshopReportDetail';
 import TaskReports from './pages/TaskReports';
+import TaskReportDetail from './pages/TaskReportDetail';
 import DeviceReports from './pages/DeviceReports';
+import DeviceReportDetail from './pages/DeviceReportDetail';
 import ExportReports from './pages/ExportReports';
 import './index.css';
 
@@ -26,9 +30,13 @@ function App() {
                 <Route path="/personnel" element={<Personnel />} />
                 <Route path="/units" element={<Units />} />
                 <Route path="/training-reports" element={<TrainingReports />} />
+                <Route path="/training-reports/:id" element={<TrainingReportDetail />} />
                 <Route path="/workshop-reports" element={<WorkshopReports />} />
+                <Route path="/workshop-reports/:id" element={<WorkshopReportDetail />} />
                 <Route path="/task-reports" element={<TaskReports />} />
+                <Route path="/task-reports/:id" element={<TaskReportDetail />} />
                 <Route path="/device-reports" element={<DeviceReports />} />
+                <Route path="/device-reports/:id" element={<DeviceReportDetail />} />
                 <Route path="/export" element={<ExportReports />} />
               </Routes>
             </div>
